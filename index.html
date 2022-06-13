@@ -170,10 +170,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-06-12 14:41:48 / 修改时间：17:15:15" itemprop="dateCreated datePublished" datetime="2022-06-12T14:41:48+08:00">2022-06-12</time>
+              <time title="创建时间：2022-06-12 14:41:48" itemprop="dateCreated datePublished" datetime="2022-06-12T14:41:48+08:00">2022-06-12</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-13 15:48:35" itemprop="dateModified" datetime="2022-06-13T15:48:35+08:00">2022-06-13</time>
+              </span>
 
           
 
@@ -186,10 +192,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="第八章-数据处理的两个基本问题"><a href="#第八章-数据处理的两个基本问题" class="headerlink" title="第八章 数据处理的两个基本问题"></a>第八章 数据处理的两个基本问题</h1><p>本章定义描述性符号：reg和sreg。用reg来表示一个寄存器，sreg来代表一个段寄存器。</p>
+          <h1 id="第八章-数据处理的两个基本问题"><a href="#第八章-数据处理的两个基本问题" class="headerlink" title="第八章 数据处理的两个基本问题"></a>第八章 数据处理的两个基本问题</h1><ol>
+<li><p>本章定义描述性符号：reg和sreg。用reg来表示一个寄存器，sreg来代表一个段寄存器。</p>
 <p>reg的集合包括：ax，bx，cx，dx，ah，al，bh，bl，ch，cl，dh，dl，sp，bp，si，di；</p>
 <p>sreg的集合包括：ds，ss，cs，es。</p>
-<ol>
+</li>
 <li><p>bx、si、di、bp</p>
 <ul>
 <li>在8086CPU中，只有这四个寄存器可以用在[…]中进行内存单元的寻址；</li>
@@ -244,6 +251,100 @@
 <li><p>伪指令dd：dd用来定义dword(double word)型数据的，即占两个字的数据。</p>
 </li>
 <li><p>dup：用来进行数据的重复，也是伪指令，比如：<code>db 3 dup (0)</code>表示定义3个字节，它们的值都是0。</p>
+</li>
+</ol>
+<h1 id="第九章-转移指令的原理"><a href="#第九章-转移指令的原理" class="headerlink" title="第九章 转移指令的原理"></a>第九章 转移指令的原理</h1><ol>
+<li><p>可以修改IP，或同时修改CS和IP的指令统称为转移指令，转移指令就是可以控制CPU执行内存中某处代码的指令。</p>
+</li>
+<li><p>8086CPU的转移行为有以下几类：</p>
+<ul>
+<li>只修改IP时，被称为段内转移，比如：<code>jmp ax</code>，段内转移又分为短转移和近转移。<ul>
+<li>短转移IP的修改范围为-128~127</li>
+<li>近转移的修改范围为-32768~32767</li>
+</ul>
+</li>
+<li>同时修改CS和IP时，称为段间转移，比如：<code>jmp 1000:0 </code></li>
+</ul>
+</li>
+<li><p>8086CPU的转移指令分为以下几类：</p>
+<ul>
+<li>无条件转移指令</li>
+<li>条件转移指令</li>
+<li>循环指令</li>
+<li>过程</li>
+<li>中断</li>
+</ul>
+</li>
+<li><p>操作符offset</p>
+<p>操作符offset是由编译器处理的符号，它的功能是取得标号的偏移地址，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">assume cs:codesg</span><br><span class="line">codesg segment</span><br><span class="line">	start:mov ax,offset start ;相当于mov ax,0</span><br><span class="line">	s:mov ax,offset s ;相当于mov ax,3</span><br><span class="line">codesg ends</span><br><span class="line">end start</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>jmp指令</p>
+<ul>
+<li>jmp为无条件转移指令，可以只修改IP，也可以同时修改CS和IP。</li>
+<li>jmp指令要给出两种信息：<ol>
+<li>转移的目的地址</li>
+<li>转移的距离(段间转移、段内短转移、段内近转移)</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>依据位移进行转移的jmp指令</p>
+<ul>
+<li><p><code>jmp short 标号</code>，这实现的是段内短转移，它对IP的修改范围是-128~127。</p>
+</li>
+<li><p><strong>CPU在执行jmp指令的时候并不需要转移的目的地址，那么如何实现修改IP呢？</strong></p>
+<p>其实这句指令的机器码只是告诉CPU要转移的位移(就是IP要加或减多少才能到要到的位置)，并不是直接告诉它需要跳到的位置。</p>
+</li>
+<li><p>实际上，<code>jmp short 标号</code>的功能为：(IP) &#x3D; (IP) + 8位位移</p>
+</li>
+<li><p>还有一种功能相近的指令格式：<code>jmp near ptr 标号</code>，它实现的是段内近转移。</p>
+</li>
+</ul>
+</li>
+<li><p>转移的目的地址在指令中的jmp指令</p>
+<p><code>jmp far ptr 标号</code>实现的是段间转移，又称为远转移。far ptr指明了指令用标号的段地址和偏移地址修改CS和IP。</p>
+</li>
+<li><p>转移地址在寄存器中的jmp指令</p>
+<p>格式：<code>jmp 16位reg</code></p>
+<p>功能：(IP) &#x3D; (16位reg)</p>
+</li>
+<li><p>转移地址在内存中的jmp指令</p>
+<ol>
+<li><code>jmp word ptr 内存单元地址(段内转移)</code><ul>
+<li>功能：从内存单元地址处开始存放着一个字，是转移的目的偏移地址，内存单元地址可以用寻址方式的任一格式给出。</li>
+</ul>
+</li>
+<li><code>jmp dword ptr 内存单元地址(段间转移)</code><ul>
+<li>功能：从内存单元地址处开始存放着两个字，高地址处的字是转移的目的段地址，低地址处是转移的目的偏移地址。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>jcxz指令</p>
+<ul>
+<li><p>jcxz指令为有条件转移指令，所有的有条件转移指令都是短转移，在对应的机器码中包含转移的位移，而不是目的地址。对IP的修改范围都为：-127~128。</p>
+</li>
+<li><p>指令格式：<code>jcxz 标号</code> </p>
+</li>
+<li><p>操作：当cx &#x3D; 0时，(IP) &#x3D; (IP) + 8位位移</p>
+</li>
+<li><p>功能相当于：<code>if((cx) == 0)) jmp short 标号</code></p>
+</li>
+</ul>
+</li>
+<li><p>loop指令</p>
+<ul>
+<li>loop指令为循环指令，所有的循环指令都是短转移。</li>
+<li>指令格式：<code>loop 标号</code></li>
+<li>操作：<ol>
+<li><code>(cx) = (cx) - 1</code></li>
+<li>如果<code>(cx) !== 0</code>,(IP) &#x3D; (IP) + 8位位移</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>根据位移进行转移的意义：方便程序段在内存中的浮动装配。</p>
 </li>
 </ol>
 
