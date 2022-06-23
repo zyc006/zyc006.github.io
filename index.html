@@ -170,10 +170,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-06-20 20:43:25 / 修改时间：22:10:21" itemprop="dateCreated datePublished" datetime="2022-06-20T20:43:25+08:00">2022-06-20</time>
+              <time title="创建时间：2022-06-20 20:43:25" itemprop="dateCreated datePublished" datetime="2022-06-20T20:43:25+08:00">2022-06-20</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-23 16:05:32" itemprop="dateModified" datetime="2022-06-23T16:05:32+08:00">2022-06-23</time>
+              </span>
 
           
 
@@ -218,7 +224,107 @@
 <img src="/2022/06/20/webpack%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20220620220828722.png" class="" title="image-20220620220828722">
 
 <p>在这个文件中进行五个要素的相关配置如上图，这样我们打包时可以使用命令<code>npx webpack</code>，效果和上一节是相同的。</p>
-<h2 id="开发模式介绍"><a href="#开发模式介绍" class="headerlink" title="开发模式介绍"></a>开发模式介绍</h2>
+<h2 id="开发模式介绍"><a href="#开发模式介绍" class="headerlink" title="开发模式介绍"></a>开发模式介绍</h2><p>是我们开发代码时使用的模式，主要做两件事：</p>
+<ol>
+<li>编译代码，使浏览器可以识别运行：要编译样式资源、字体图标、图片资源等webpack不能默认处理的资源；</li>
+<li>进行代码质量检查，树立代码规范。</li>
+</ol>
+<h2 id="处理样式资源"><a href="#处理样式资源" class="headerlink" title="处理样式资源"></a>处理样式资源</h2><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>webpack本身不能处理样式资源，所以需要借助loader来进行处理。</p>
+<p><a target="_blank" rel="noopener" href="https://webpack.docschina.org/loaders/">webpack官方loader文档</a></p>
+<h3 id="处理CSS资源"><a href="#处理CSS资源" class="headerlink" title="处理CSS资源"></a>处理CSS资源</h3><p>我们需要使用两个loader：style-loader和css-loader。写好的css文件依旧导入到<code>main.js</code>中即可。对于loader，先下载，然后再进行配置，最后重新进行打包：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">module</span>: &#123;</span><br><span class="line">	<span class="attr">rules</span>: [</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="attr">test</span>: <span class="regexp">/\.css$/i</span>,</span><br><span class="line">			<span class="attr">use</span>: [<span class="string">&#x27;style-loader&#x27;</span>,<span class="string">&#x27;css-loader&#x27;</span>]</span><br><span class="line">		&#125;</span><br><span class="line">	]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>test意味着这个规则要匹配什么文件(正则表达式匹配)；use意味着使用哪些loader，执行顺序为从右往左。</p>
+<blockquote>
+<p>style-loader的作用为将js中的css通过创建style标签添加到html文件中；</p>
+<p>css-loader的作用为将css资源编译成commonjs的模块到js中。</p>
+</blockquote>
+<img src="/2022/06/20/webpack%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20220623133210329.png" class="" title="image-20220623133210329">
+
+<h3 id="处理less资源、sass资源、stylus资源"><a href="#处理less资源、sass资源、stylus资源" class="headerlink" title="处理less资源、sass资源、stylus资源"></a>处理less资源、sass资源、stylus资源</h3><p>需要使用less-loader&#x2F;cass-loader&#x2F;stylus-loader进行处理，其作用为将less&#x2F;sass&#x2F;scss&#x2F;styl文件编译为css文件。因此需要再写一个配置项，大致步骤与处理css资源是一样的，以处理less资源为例，如图所示：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">test</span>: <span class="regexp">/\.less$/i</span>,</span><br><span class="line">	<span class="attr">use</span>: [<span class="string">&#x27;style-loader&#x27;</span>,<span class="string">&#x27;css-loader&#x27;</span>,<span class="string">&#x27;less-loader&#x27;</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>如果这段配置中只使用一种loader,那么可以写成</strong><code>loader: &#39;xxx&#39;</code>。</p>
+<h2 id="处理图片资源"><a href="#处理图片资源" class="headerlink" title="处理图片资源"></a>处理图片资源</h2><p>webpack5内置了处理图片资源的方式：</p>
+<p>更改之前的css文件和less文件，使用准备好的图片：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.box1</span>&#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">background-image</span>: <span class="built_in">url</span>(<span class="string">&#x27;../images/1.jpeg&#x27;</span>);</span><br><span class="line">    <span class="attribute">background-size</span>: cover;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.box1</span>&#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">background-image</span>: <span class="built_in">url</span>(<span class="string">&#x27;../images/2.png&#x27;</span>);</span><br><span class="line">    <span class="attribute">background-size</span>: cover;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.box1</span>&#123;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">background-image</span>: <span class="built_in">url</span>(<span class="string">&#x27;../images/3.gif&#x27;</span>);</span><br><span class="line">    <span class="attribute">background-size</span>: cover;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>打包之后可以正常显示。这说明不做配置也可以打包图片，但是这样就不可以使用更细化的配置了。所以还是要编写配置项：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">test</span>: <span class="regexp">/\.(png|jpe?g|gif|webp|svg)$/</span>,</span><br><span class="line">	<span class="attr">type</span>: <span class="string">&#x27;asset&#x27;</span>,</span><br><span class="line">    <span class="attr">parser</span>: &#123;</span><br><span class="line">        <span class="attr">dataUrlCondition</span>: &#123;</span><br><span class="line">            <span class="attr">maxSize</span>: <span class="number">10</span> * <span class="number">1024</span>, <span class="comment">// 10kb</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的parser是什么作用呢？是将小于10kb的图片转为base64，这样可以减少请求的数量，不过体积会变大一点。可以看到这张图片由于大小是5kb，来源已经被转成base64字符串了。</p>
+<img src="/2022/06/20/webpack%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20220623140924447.png" class="" title="image-20220623140924447">
+
+<h2 id="修改输出文件目录"><a href="#修改输出文件目录" class="headerlink" title="修改输出文件目录"></a>修改输出文件目录</h2><p>想要改变输出文件的目录，当然需要配置output。我们可以做出这样的更改：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">output</span>: &#123;</span><br><span class="line">        <span class="comment">// 输出路径 需为绝对路径 __dirname当前文件的文件夹目录</span></span><br><span class="line">        <span class="attr">path</span>: path.<span class="title function_">resolve</span>(__dirname,<span class="string">&#x27;dist&#x27;</span>),</span><br><span class="line">        <span class="comment">// 入口文件打包输出文件名</span></span><br><span class="line">        <span class="comment">// filename: &#x27;main.js&#x27;</span></span><br><span class="line">        <span class="comment">// filename： &#x27;static/js/main.js&#x27;</span></span><br><span class="line">        <span class="attr">filename</span>: <span class="string">&#x27;js/main.js&#x27;</span></span><br><span class="line">    &#125;,</span><br></pre></td></tr></table></figure>
+
+<img src="/2022/06/20/webpack%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20220623141521268.png" class="" title="image-20220623141521268">
+
+<p>可以看到入口文件在js文件夹中，图片仍然在dist文件夹中。</p>
+<p>在图片的loader配置中加入下面的代码，可以让图片打包到images文件夹：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">generator</span>: &#123;</span><br><span class="line">    <span class="attr">filename</span>: <span class="string">&#x27;static/images/[hash][ext][query]&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的<code>[hash][ext][query]</code>是什么意思呢？hash是哈希值，特点是唯一的，这样名称不会重复；ext是文件扩展名；query是可能携带的查询参数。重新打包，这时可以看到文件目录已经改变了：</p>
+<img src="/2022/06/20/webpack%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20220623142210189.png" class="" title="image-20220623142210189">
+
+<p>哈希值导致图片名称过长，那么可以再次更改配置<code>filename: &#39;static/images/[hash:10][ext][query]&#39;</code>，这样哈希值只会保留十位。</p>
+<h2 id="自动清空打包内容"><a href="#自动清空打包内容" class="headerlink" title="自动清空打包内容"></a>自动清空打包内容</h2><p>在output中加入<code>clean: true</code>，会自动清空上一次的打包结果。</p>
+<h2 id="处理字体图标资源"><a href="#处理字体图标资源" class="headerlink" title="处理字体图标资源"></a>处理字体图标资源</h2><p>和图片类似，不需要额外的loader，引入字体图标后直接配置即可：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">test</span>: <span class="regexp">/\.(ttf|woff2?)$/</span>,</span><br><span class="line">    <span class="attr">type</span>: <span class="string">&#x27;asset/resource&#x27;</span>,</span><br><span class="line">    <span class="attr">generator</span>: &#123;</span><br><span class="line">        <span class="attr">filename</span>: <span class="string">&#x27;static/media/[hash:10][ext][query]&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里配置了字体文件，不需要做其它的配置，正常使用即可。iconfont文件已经被css文件的配置项管理了。</p>
+<h2 id="处理其它资源"><a href="#处理其它资源" class="headerlink" title="处理其它资源"></a>处理其它资源</h2><p>还需要处理音视频资源。它们只需要原封不动的输出，所以和字体文件的配置相同，在test里加入音视频文件的后缀即可。</p>
+<h2 id="处理js资源"><a href="#处理js资源" class="headerlink" title="处理js资源"></a>处理js资源</h2><p>webpack 对 js 处理是有限的，只能编译 js 中 ES 模块化语法，不能编译其他语法，导致 js 不能在 IE 等浏览器运行，所以我们希望做一些兼容性处理(babel)。我们还需要对代码的格式(eslint)进行处理。</p>
+<h3 id="Eslint"><a href="#Eslint" class="headerlink" title="Eslint"></a>Eslint</h3><ol>
+<li><p>简单介绍</p>
+<p>是可组装的Javascript和JSX检查工具。使用Eslint要写Eslint配置文件。</p>
+<p>配置文件的写法很多(有一个即可)：</p>
+<ul>
+<li><code>.eslintrc</code></li>
+<li><code>.eslintrc.js</code></li>
+<li><code>.eslintrc.json</code></li>
+</ul>
+<p>它们的区别在于配置和格式不同，此外还有<code>package.json</code>中的<code>eslintConfig</code>，这种写法不需要创建文件，只需要在原有的文件基础上写。</p>
+</li>
+<li><p>配置文件</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">    <span class="comment">//解析选项</span></span><br><span class="line">    <span class="attr">parseOptions</span>: &#123;&#125;,</span><br><span class="line"> 	<span class="comment">//具体检查规则</span></span><br><span class="line">    <span class="attr">rules</span>: &#123;&#125;,</span><br><span class="line">    <span class="comment">//继承其它规则</span></span><br><span class="line">    <span class="attr">extends</span>: [],</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="comment">// 其他规则：https://eslint.bootcss.com/docs/user-guide/configuring</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来依次解释每个配置项：</p>
+<ul>
+<li><p>parserOptions</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">parseOptions</span>: &#123;</span><br><span class="line">    <span class="attr">ecmaVersion</span>: <span class="number">6</span>, <span class="comment">//ES语法版本</span></span><br><span class="line">    <span class="attr">sourceType</span>: <span class="string">&#x27;module&#x27;</span>, <span class="comment">//ES模块化</span></span><br><span class="line">    <span class="attr">ecmaFeatures</span>: &#123; <span class="comment">//ES其他特性</span></span><br><span class="line">        <span class="attr">jsx</span>: <span class="literal">true</span> <span class="comment">//react项目需要开启JSX语法检查</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>rules</p>
+<ul>
+<li><code>&quot;off&quot;</code> 或 <code>0</code> - 关闭规则</li>
+<li><code>&quot;warn&quot;</code> 或 <code>1</code> - 开启规则，使用警告级别的错误：<code>warn</code> (不会导致程序退出)</li>
+<li><code>&quot;error&quot;</code> 或 <code>2</code> - 开启规则，使用错误级别的错误：<code>error</code> (当被触发的时候，程序会退出)</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">rules</span>: &#123;</span><br><span class="line">    <span class="attr">semi</span>: <span class="string">&#x27;error&#x27;</span>, <span class="comment">// 禁止使用分号</span></span><br><span class="line">    <span class="string">&#x27;array-callback-return&#x27;</span>: <span class="string">&#x27;warn&#x27;</span>, <span class="comment">// 强制数组方法的回调函数中有return语句，否则警告</span></span><br><span class="line">    <span class="string">&#x27;default-case&#x27;</span>: [</span><br><span class="line">        <span class="string">&#x27;warn&#x27;</span>, <span class="comment">// 要求switch语句中有default分支，否则警告</span></span><br><span class="line">        &#123;<span class="attr">commentPattern</span>: <span class="string">&#x27;no default$&#x27;</span>&#125; <span class="comment">// 允许在最后注释no default，这样不会有警告</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">eqeqeq</span>: [</span><br><span class="line">        <span class="string">&#x27;warn&#x27;</span>, <span class="comment">// 强制使用!== 和 ===，否则警告</span></span><br><span class="line">        <span class="string">&#x27;smart&#x27;</span> <span class="comment">// https://eslint.bootcss.com/docs/rules/eqeqeq#smart 除了少数情况下不会有警告</span></span><br><span class="line">    ],</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>extends 继承</p>
+<p>继承现有的规则，就不需要自己写了：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://eslint.bootcss.com/docs/rules/">Eslint 官方的规则open in new window</a>：<code>eslint:recommended</code></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/vuejs/vue-cli/tree/dev/packages/@vue/cli-plugin-eslint">Vue Cli 官方的规则open in new window</a>：<code>plugin:vue/essential</code></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/facebook/create-react-app/tree/main/packages/eslint-config-react-app">React Cli 官方的规则open in new window</a>：<code>react-app</code></li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 例如在React项目中，我们可以这样写配置</span></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">  <span class="attr">extends</span>: [<span class="string">&quot;react-app&quot;</span>],</span><br><span class="line">  <span class="attr">rules</span>: &#123;</span><br><span class="line">    <span class="comment">// 我们的规则会覆盖掉react-app的规则</span></span><br><span class="line">    <span class="comment">// 所以想要修改规则直接改就是了</span></span><br><span class="line">    <span class="attr">eqeqeq</span>: [<span class="string">&quot;warn&quot;</span>, <span class="string">&quot;smart&quot;</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>在webpack中使用</p>
+<p>需要下载<code>eslint-webpack-plugin</code>和<code>eslint</code>。<strong>插件(plugin)需要引入才能使用</strong>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">plugins</span>: [</span><br><span class="line">        <span class="comment">// plugins的配置</span></span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ESLintPlugin</span>(&#123;</span><br><span class="line">            <span class="comment">// 检测哪些文件</span></span><br><span class="line">            <span class="attr">context</span>: path.<span class="title function_">resolve</span>(__dirname,<span class="string">&#x27;src&#x27;</span>)</span><br><span class="line">        &#125;)</span><br><span class="line">    ],</span><br></pre></td></tr></table></figure>
+
+<p>此外，还需要写好eslint的配置文件，新建<code>.eslintrc.js</code>文件，写入相关的配置，打包后就会生效。</p>
+<p>再次编译时，如果你有代码错误，会直接报错，如图为使用了var的错误：</p>
+<img src="/2022/06/20/webpack%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20220623160223262.png" class="" title="image-20220623160223262">
+</li>
+<li><p>vscode的eslint插件</p>
+</li>
+</ol>
+<p>​	eslint插件会即时检查你的代码错误，但是它会检查所有的文件，这时候可以新建<code>.eslintigore</code>文件，直接在其中写入不需要被检查的文件夹即可。</p>
+<h3 id="Babel"><a href="#Babel" class="headerlink" title="Babel"></a>Babel</h3>
       
     </div>
 
