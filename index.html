@@ -178,7 +178,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-29 15:21:34" itemprop="dateModified" datetime="2022-06-29T15:21:34+08:00">2022-06-29</time>
+                <time title="修改时间：2022-06-30 15:24:26" itemprop="dateModified" datetime="2022-06-30T15:24:26+08:00">2022-06-30</time>
               </span>
 
           
@@ -652,9 +652,8 @@
 
 <p>这个文件里面有所有自定义实现，因此我们不妨按需加载：<code>import &#39;core-js/es/promise&#39;</code>，这个路径可以在<code>node_modules</code>里寻找。</p>
 <p>如果以后有了别的语法，如<code>async</code>，我们手动引入还是太慢了。那么我们可以在<code>babel.config.js</code>中进行配置，让它自动根据使用的语法进行引入：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">    <span class="attr">presets</span>: [</span><br><span class="line">        [<span class="string">&quot;@babel/preset-env&quot;</span>, &#123;</span><br><span class="line">            <span class="comment">// 自动引入</span></span><br><span class="line">            <span class="attr">useBuiltIns</span>: <span class="string">&#x27;usage&#x27;</span>,</span><br><span class="line">            <span class="attr">corejs</span>: &#123;</span><br><span class="line">                <span class="attr">version</span>: <span class="string">&#x27;3&#x27;</span>,</span><br><span class="line">                <span class="attr">proposals</span>: <span class="literal">true</span></span><br><span class="line">            &#125;,</span><br><span class="line">        &#125;],</span><br><span class="line">    ] </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">    <span class="attr">presets</span>: [</span><br><span class="line">        [<span class="string">&quot;@babel/preset-env&quot;</span>, &#123;</span><br><span class="line">            <span class="comment">// 自动引入</span></span><br><span class="line">            <span class="attr">useBuiltIns</span>: <span class="string">&#x27;usage&#x27;</span>,</span><br><span class="line">            <span class="attr">corejs</span>: &#123;</span><br><span class="line">                <span class="comment">// 这里必须写你的core-js的具体版本</span></span><br><span class="line">                <span class="attr">version</span>: <span class="string">&#x27;3.23&#x27;</span>,</span><br><span class="line">                <span class="attr">proposals</span>: <span class="literal">true</span></span><br><span class="line">            &#125;,</span><br><span class="line">        &#125;],</span><br><span class="line">    ] </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><strong>这里并没有生成711文件了，还需要研究为什么，是配置错了吗🤔</strong></p>
 <h3 id="PWA"><a href="#PWA" class="headerlink" title="PWA"></a>PWA</h3><p>给项目提供离线体验。渐进式网络应用程序(progressive web application - PWA)：是一种可以提供类似于 native app(原生应用程序) 体验的 Web App 的技术。</p>
 <p>其中最重要的是，在 <strong>离线(offline)</strong> 时应用程序能够继续运行功能。</p>
 <p>内部通过 Service Workers 技术实现的。</p>
@@ -688,8 +687,13 @@ if (&quot;serviceWorker&quot; in navigator) &#123;
 <p>此时如果直接通过 VSCode 访问打包后页面，在浏览器控制台会发现 <code>SW registration failed</code>。</p>
 <p>因为我们打开的访问路径是：<code>http://127.0.0.1:5500/dist/index.html</code>。此时页面会去请求 <code>service-worker.js</code> 文件，请求路径是：<code>http://127.0.0.1:5500/service-worker.js</code>，这样找不到会 404。</p>
 <p>实际 <code>service-worker.js</code> 文件路径是：<code>http://127.0.0.1:5500/dist/service-worker.js</code>。我们可以<code>npm i serve</code>，再<code>serve dist</code>来解决。</p>
-<p><strong>这里也出现了问题，以后再研究。</strong></p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>我们从 4 个角度对 webpack 和代码进行了优化：</p>
+<p>这里可以看到我们缓存的资源。</p>
+<img src="/2022/06/20/webpack%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20220630151303981.png" class="" title="image-20220630151303981">
+
+<p>调成离线后，仍有内容。</p>
+<img src="/2022/06/20/webpack%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20220630151339698.png" class="" title="image-20220630151339698">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>我们从 4 个角度对 webpack 和代码进行了优化：</p>
 <ul>
 <li><p>提升开发体验</p>
 <ul>
